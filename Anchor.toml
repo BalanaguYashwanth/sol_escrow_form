@@ -1,0 +1,15 @@
+[features]
+seeds = false
+[programs.localnet]
+sol_forms_escrow = "CWXvXP8jaxjj78SxeAAFy2fiYXQg2sDtjJzeu45Z2pak"
+
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "devnet"
+wallet = "./id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
