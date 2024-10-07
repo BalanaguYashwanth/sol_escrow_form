@@ -1,14 +1,17 @@
-[features]
-seeds = false
-[programs.localnet]
-sol_forms_escrow = "CWXvXP8jaxjj78SxeAAFy2fiYXQg2sDtjJzeu45Z2pak"
+[toolchain]
 
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+sol_forms_escrow = "8jYpZsfT5mP5LC6Fw2GhD8PjXgJHYKkNedeg85tjAvcx"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "devnet"
+cluster = "Devnet"
 wallet = "./id.json"
 
 [scripts]

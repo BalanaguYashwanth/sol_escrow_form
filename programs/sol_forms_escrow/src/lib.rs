@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("CWXvXP8jaxjj78SxeAAFy2fiYXQg2sDtjJzeu45Z2pak");
+declare_id!("8jYpZsfT5mP5LC6Fw2GhD8PjXgJHYKkNedeg85tjAvcx");
 
 #[program]
 pub mod sol_forms_escrow {
@@ -10,9 +10,7 @@ pub mod sol_forms_escrow {
         amount: u64,
         budget: u64,
         cpr: u64,
-        end_date: u64,
-        start_date: u64,
-        status: String,
+        entry_id: u64,
         title: String,
         creator: String
     ) -> Result<()> {
@@ -20,11 +18,9 @@ pub mod sol_forms_escrow {
         // form_entry.owner = ctx.accounts.owner.key();
         form_entry.budget = budget;
         form_entry.cpr = cpr;
-        form_entry.end_date = end_date;
-        form_entry.start_date = start_date;
         form_entry.title = title;
-        form_entry.status = status;
         form_entry.creator = creator;
+        form_entry.entry_id = entry_id;
 
         // Perform lamport transfer first (immutable reference needed here)
         anchor_lang::system_program::transfer(
@@ -48,7 +44,6 @@ pub mod sol_forms_escrow {
         let form = &mut ctx.accounts.form_entry;
         let user = &mut ctx.accounts.user;
 
-        // Perform the transfer of lamports from form to user
         **form.to_account_info().try_borrow_mut_lamports()? -= amount;
         **user.to_account_info().try_borrow_mut_lamports()? += amount;
 
@@ -59,24 +54,18 @@ pub mod sol_forms_escrow {
 #[account]
 pub struct FormState {
     pub cpr: u64,
-    pub budget: u64,  // Ensure budget is part of the state
-    pub entry_id: u64, // Entry ID for frontend indexing
-    pub end_date: u64,
-    pub start_date: u64,
-    pub status: String,
+    pub budget: u64,
+    pub entry_id: u64,
     pub title: String,
     pub creator: String
 }
 
 #[derive(Accounts)]
-#[instruction(title: String)]
 pub struct CreateEntry<'info> {
     #[account(
-        init,
-        seeds = [title.as_bytes(), owner.key().as_ref()],
-        bump,
+        init_if_needed,
         payer = owner,
-        space = 8 + std::mem::size_of::<FormState>(),  // Updated space calculation
+        space = 8 + std::mem::size_of::<FormState>()
     )]
     pub form_entry: Account<'info, FormState>,
     #[account(mut)]
