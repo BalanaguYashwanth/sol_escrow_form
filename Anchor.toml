@@ -5,7 +5,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-sol_forms_escrow = "8jYpZsfT5mP5LC6Fw2GhD8PjXgJHYKkNedeg85tjAvcx"
+sol_forms_escrow = "KzXK3nTcUD6KaG5aBkBmRkMy61un83K8YoQNzv72zqb"
+
+[programs.devnet]
+sol_forms_escrow = "KzXK3nTcUD6KaG5aBkBmRkMy61un83K8YoQNzv72zqb"
+
+[programs.mainnet]
+sol_forms_escrow = "KzXK3nTcUD6KaG5aBkBmRkMy61un83K8YoQNzv72zqb"
 
 [registry]
 url = "https://anchor.projectserum.com"

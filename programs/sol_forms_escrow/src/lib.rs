@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("8jYpZsfT5mP5LC6Fw2GhD8PjXgJHYKkNedeg85tjAvcx");
+declare_id!("KzXK3nTcUD6KaG5aBkBmRkMy61un83K8YoQNzv72zqb");
 
 #[program]
 pub mod sol_forms_escrow {
@@ -15,7 +15,6 @@ pub mod sol_forms_escrow {
         creator: String
     ) -> Result<()> {
         let form_entry = &mut ctx.accounts.form_entry;
-        // form_entry.owner = ctx.accounts.owner.key();
         form_entry.budget = budget;
         form_entry.cpr = cpr;
         form_entry.title = title;
@@ -39,13 +38,20 @@ pub mod sol_forms_escrow {
 
     pub fn reward(
         ctx: Context<Withdraw>,
-        amount: u64
     ) -> Result<()> {
         let form = &mut ctx.accounts.form_entry;
         let user = &mut ctx.accounts.user;
 
-        **form.to_account_info().try_borrow_mut_lamports()? -= amount;
-        **user.to_account_info().try_borrow_mut_lamports()? += amount;
+        // Transfer lamports from form_entry to user
+        let form_lamports = **form.to_account_info().try_borrow_mut_lamports()?;
+        
+        // Ensure form entry has enough funds
+        if form_lamports < form.cpr {
+            return Err(ProgramError::InsufficientFunds.into());
+        }
+
+        **form.to_account_info().try_borrow_mut_lamports()? -= form.cpr; 
+        **user.to_account_info().try_borrow_mut_lamports()? += form.cpr;
 
         Ok(())
     }
@@ -57,7 +63,7 @@ pub struct FormState {
     pub budget: u64,
     pub entry_id: u64,
     pub title: String,
-    pub creator: String
+    pub creator: String,
 }
 
 #[derive(Accounts)]
@@ -78,5 +84,8 @@ pub struct Withdraw<'info> {
     #[account(mut)]
     pub form_entry: Account<'info, FormState>,
     #[account(mut)]
-    pub user: Signer<'info>,
+    /// CHECK: The user account must be a valid wallet address to receive the reward.
+    pub user: AccountInfo<'info>, 
+    #[account(mut)]
+    pub owner: Signer<'info>,
 }
